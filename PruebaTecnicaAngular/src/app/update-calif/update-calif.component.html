@@ -1,0 +1,13 @@
+<p>Actualizar Calificacion</p>
+
+<div style="">
+    <h3 style="margin-bottom: 0px;">Materia</h3>
+    <p style="margin-top: 0px;">{{nombreMateria}}</p>
+</div>
+
+<div>
+    <label >Calificacion*</label>
+    <input type="number" min="1" max="10" [(ngModel)]="calificacionText">
+</div>
+
+<button style="margin-left: 10px;" (click)="save()">Actualizar</button>

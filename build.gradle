@@ -1,0 +1,163 @@
+plugins {
+    id("com.github.johnrengelman.shadow") version "7.1.1"
+    id("io.micronaut.application") version "3.6.3"
+    id("io.micronaut.test-resources") version "3.6.3"
+    id("nu.studer.jooq") version "7.1.1"
+    id ("org.flywaydb.flyway") version "9.7.0"
+    id ("com.avast.gradle.docker-compose") version "0.12.1"
+}
+
+version = "0.1"
+group = "com.prueba"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    annotationProcessor("io.micronaut:micronaut-http-validation")
+    annotationProcessor("io.micronaut.openapi:micronaut-openapi")
+    annotationProcessor("io.micronaut.security:micronaut-security-annotations")
+    implementation("io.micronaut:micronaut-http-client")
+    implementation("io.micronaut:micronaut-jackson-databind")
+    implementation("io.micronaut.security:micronaut-security-jwt")
+    implementation("io.micronaut.sql:micronaut-jdbc-hikari")
+    implementation("io.micronaut.sql:micronaut-jooq")
+    implementation("io.swagger.core.v3:swagger-annotations")
+    implementation("jakarta.annotation:jakarta.annotation-api")
+    runtimeOnly("ch.qos.logback:logback-classic")
+    jooqGenerator ("org.postgresql:postgresql:42.5.0")
+    implementation ("org.postgresql:postgresql:42.5.0")
+    implementation("jakarta.persistence:jakarta.persistence-api:3.1.0")
+    implementation("jakarta.validation:jakarta.validation-api:3.0.2")
+
+    implementation("io.micronaut:micronaut-validation")
+
+    implementation("io.micronaut.flyway:micronaut-flyway")
+
+}
+
+def dbDriver = System.getenv('DATABASE_DRIVER') ?: 'org.postgresql.Driver'
+def dbUser = System.getenv('DATABASE_USER') ?: 'hector'
+def dbPassword = System.getenv('DATABASE_PASSWORD') ?: '1234'
+def dbHost = System.getenv('DATABASE_HOST') ?: '127.0.0.1'
+def dbPort = System.getenv('DATABASE_PORT') ?: 5432
+def dbName = System.getenv('DATABASE_NAME') ?: 'public'
+def dbUrl = System.getenv('DATABASE_URL') ?: "jdbc:postgresql://$dbHost:$dbPort/$dbName"
+
+
+
+
+// NOTA: descomentar solo para actualizar los pojos de tablas de jooq
+// la cual primero se ejecuta flying junto con docker para crear las tablas y el script sql
+// despues se ejecuta el pugin de jooq para hacer el mapeo
+
+/*jooq {
+    configurations {
+        main {
+            generationTool {
+                logging = org.jooq.meta.jaxb.Logging.WARN
+                jdbc {
+                    driver = dbDriver
+                    url = dbUrl
+                    user = dbUser
+                    password = dbPassword
+                    properties {
+                        // SSL disabled at the moment (only running locally)
+                        property {
+                            key = 'ssl'
+                            value = 'false'
+                        }
+                    }
+                }
+                generator {
+                    name = 'org.jooq.codegen.DefaultGenerator'
+                    database {
+                        name = 'org.jooq.meta.postgres.PostgresDatabase'
+                        inputSchema = 'public'
+                        forcedTypes {
+                            forcedType {
+                                name = 'varchar'
+                                includeExpression = '.*'
+                                includeTypes = 'JSONB?'
+                            }
+                            forcedType {
+                                name = 'varchar'
+                                includeExpression = '.*'
+                                includeTypes = 'INET'
+                            }
+                        }
+                    }
+                    generate {
+                        // JPA annotations required for micronaut to annotate the generated classes correctly
+                        fluentSetters = true
+                        validationAnnotations = true
+                        jpaAnnotations = true
+                        pojos = false
+                        daos = true
+                    }
+                    target {
+                        packageName = 'jooq'
+                        directory = 'src/main/java/com/prueba/Migration'
+                    }
+                    strategy.name = 'org.jooq.codegen.DefaultGeneratorStrategy'
+                }
+            }
+        }
+    }
+}
+
+task migratePrimaryDB(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
+    locations = ['filesystem:src/main/resources/db/postgres/']
+    url = dbUrl
+    user = dbUser
+    password = dbPassword
+    baselineOnMigrate = true
+    validateOnMigrate = false
+}
+
+tasks.generateJooq.mustRunAfter(tasks.migratePrimaryDB)
+tasks.compileJava.dependsOn(tasks.migratePrimaryDB)
+tasks.migratePrimaryDB.dependsOn(tasks.composeUp)
+
+dockerCompose {
+    useComposeFiles = ['./jooq-docker-compose.yml']
+    stopContainers = true
+    // do not wait for debug port
+    tcpPortsToIgnoreWhenWaiting = [5005]
+}
+
+*/
+
+application {
+    mainClass.set("com.prueba.Application")
+}
+
+java {
+    sourceCompatibility = JavaVersion.toVersion("11")
+    targetCompatibility = JavaVersion.toVersion("11")
+}
+
+graalvmNative.toolchainDetection = false
+micronaut {
+    runtime("netty")
+    testRuntime("junit5")
+    processing {
+        incremental(true)
+        annotations("com.prueba.*")
+    }
+    testResources {
+        additionalModules.add("jdbc-postgresql")
+    }
+}
+
+//tasks.compileJava.dependsOn(tasks.dockerfile)
+dockerCompose {
+    useComposeFiles = ['./docker-compose.yml']
+    stopContainers = true
+    // do not wait for debug port
+    tcpPortsToIgnoreWhenWaiting = [5005]
+}
+
+
+

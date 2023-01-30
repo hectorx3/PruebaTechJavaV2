@@ -1,0 +1,6 @@
+applicationType: default
+defaultPackage: com.prueba
+testFramework: junit
+sourceLanguage: java
+buildTool: gradle
+features: [annotation-api, app-name, gradle, http-client, jackson-databind, java, java-application, jdbc-hikari, jooq, junit, logback, micronaut-build, netty-server, openapi, postgres, readme, security-annotations, security-jwt, shade, test-resources, yaml]

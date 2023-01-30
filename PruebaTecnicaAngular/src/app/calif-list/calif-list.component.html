@@ -1,0 +1,30 @@
+<h2>Lista de Alumnos</h2>
+
+
+<div *ngFor="let alumno of getAllAlumnos$ | async">
+
+    <h3 style="margin-bottom: 0px;">
+        <a
+          [title]="alumno.nombreCompleto"
+          [routerLink]="['/kardex', alumno.id]">
+          {{ alumno.nombreCompleto }}
+        </a>
+    </h3>
+    <p style="
+    margin: 0px;
+    padding: 0px;
+    font-size: .8em;
+    ">
+        Da clic en su nombre para ver sus calificaciones
+    </p>
+  
+    <p >
+      Description: "Alumno destacado"
+    </p>
+    
+  
+    <button type="button" (click)="share()">
+      Share
+    </button>
+  
+</div>

@@ -1,0 +1,31 @@
+version: '2'
+services:
+  web:
+    image: "micronaut-prueba"
+    build: ./build/docker/main
+    environment:
+      JDBC_URL: jdbc:postgresql://127.0.0.1:5432/public
+      JDBC_USER: hector
+      JDBC_PASSWORD: 1234
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    networks:
+      - database-network
+      - internal
+    command: [ "./wait-for-it.sh", "db:5432" ]
+  db:
+    image: postgres:15.0
+    environment:
+      - POSTGRES_DB=public
+      - POSTGRES_USER=hector
+      - POSTGRES_PASSWORD=1234
+      - PGDATA=/var/lib/pgsql_docker/data
+    ports:
+      - 5432:5432
+    networks:
+      - database-network
+networks:
+  database-network:
+  internal:

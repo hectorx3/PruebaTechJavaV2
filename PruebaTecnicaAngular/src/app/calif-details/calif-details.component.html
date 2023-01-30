@@ -1,0 +1,54 @@
+<h2>Calificaciones</h2>
+
+<div *ngIf="getCalifAlumno$ | async as alumno">
+  <h3>{{ alumno.nombreCompleto }}</h3>
+  <button>
+    <a
+    style="color: white;"
+        [title]="alumno.nombreCompleto"
+        [routerLink]="['/registrar', alumno.id]">
+        Registrar Calificacion
+    </a>
+  </button>
+
+  <button style="margin-left: 10px;">
+    <a
+    style="color: white;"
+        [title]="alumno.nombreCompleto"
+        [routerLink]="['/']">
+        Lista de Alumnos
+    </a>
+  </button>
+
+  <div style="
+      display: flex;
+    justify-content: space-between;
+    align-items: center;
+  ">
+      <p>Materia</p>
+      <p>Calificacion</p>
+      <p style="width: 50px;"></p>
+      <p style="width: 50px;"></p>
+  </div>
+  
+  <div *ngFor="let calif of alumno.calificaciones" style="
+      display: flex;
+    justify-content: space-between;
+    align-items: center;
+  ">
+      <p >{{ calif.materia }}</p>
+      <p style="margin-left: 10px;">{{ calif.calificacion }}</p>
+      <button style="margin-left: 25px;">
+        <a
+        style="color: white;"
+            [title]="alumno.nombreCompleto"
+            [queryParams]="{ materia: calif.materia, alumnoId:alumno.id}"
+            [routerLink]="['/actualizar', calif.idCalificacion]">
+            Modificar
+        </a>
+      </button>
+      <button style="margin-left: 10px;">Eliminar</button>
+  </div>
+
+  <h4>Promedio {{ alumno.promedio }}</h4>
+</div>

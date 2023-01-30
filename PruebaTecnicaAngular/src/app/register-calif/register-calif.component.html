@@ -1,0 +1,17 @@
+<p>Registrar Calificacion</p>
+
+<div>
+    <label >Materia*</label>
+    <select [(ngModel)]="selectedObject">
+        <option *ngFor="let materia of getAllMaterias$ | async" [ngValue]="materia">
+             {{materia.nombre}}
+         </option>
+    </select>
+</div>
+
+<div>
+    <label >Calificacion*</label>
+    <input type="number" min="1" max="10" [(ngModel)]="calificacionText">
+</div>
+
+<button style="margin-left: 10px;" (click)="save()">Guardar</button>
